@@ -1,9 +1,6 @@
-// Get form elements
-const sectionItems = document.getElementById("items");
-
 const apiUrl = "http://localhost:3000/api/products/";
 
-function makeRequest() {
+const makeRequest = () => {
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
     request.open("GET", apiUrl);
@@ -21,10 +18,12 @@ function makeRequest() {
 }
 
 async function displayProducts() {
+  
   try {
     const productsPromise = makeRequest();
     const response = await Promise.all([productsPromise]);
     const products = response[0];
+    const sectionItems = document.getElementById("items");
 
     for (let i = 0; i < products.length; i++) {
       sectionItems.appendChild(
@@ -36,7 +35,6 @@ async function displayProducts() {
           products[i].description
         )
       );
-      console.log(products[i].name);
     }
   } catch (error) {
     console.log("This is the error message :" + error);
