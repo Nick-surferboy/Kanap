@@ -8,17 +8,21 @@ const description = document.getElementById("description");
 const colors = document.getElementById("colors");
 const addToCartBtn = document.getElementById("addToCart");
 
-let cart = [];
+let id = 0;
+if (!sessionStorage.cart) {
+  sessionStorage.setItem("cart", JSON.stringify([]));
+}
+let cart = JSON.parse(sessionStorage.getItem("cart"));
 
 async function displayProduct() {
   //Retrieve the product id clicked previously
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  const id = urlParams.get("id");
+  id = urlParams.get("id");
 
   //Retrieve the product to display
   let product = 0;
-  const productPromise = makeRequest('GET', apiUrl+'/'+id);
+  const productPromise = makeRequest("GET", apiUrl + "/" + id);
   try {
     const response = await Promise.all([productPromise]);
     product = response[0];
@@ -45,12 +49,48 @@ async function displayProduct() {
   }
 }
 
+const addToCartHandler = (product) => {
+  const existingProductIndex = cart.findIndex(
+    (cartItem) => cartItem.id === product.id && cartItem.color === product.color
+  );
+  const existingCartProduct = cart[existingProductIndex];
+
+  let updatedProduct;
+  let updatedCart = [...cart];
+
+  if (existingCartProduct) {
+    updatedProduct = {
+      ...existingCartProduct,
+      quantity: existingCartProduct.quantity + product.quantity,
+    };
+    updatedCart[existingProductIndex] = updatedProduct;
+  } else {
+    updatedCart = cart.concat(product);
+  }
+  return updatedCart;
+};
+
 addToCartBtn.addEventListener("click", () => {
-  if (sessionStorage) {
-    //cart = sessionStorage.getItem("cart");
-    cart.concat(["Kanp", 2, "Red"]);
-    console.log("2:"+ cart)
-    sessionStorage.setItem("cart", cart);
+  const quantity = parseInt(document.getElementById("quantity").value);
+  const color = colors.value;
+  const titleCart = title.textContent;
+  const priceCart = price.textContent;
+  const imageSrc = divImage[0].getElementsByTagName("img")[0].src;
+  const imageAlt = divImage[0].getElementsByTagName("img")[0].alt;
+  const productToAdd = {
+    id,
+    color,
+    quantity,
+    titleCart,
+    imageSrc,
+    imageAlt,
+    priceCart,
+  };
+
+  if (sessionStorage.cart) {
+    cart = JSON.parse(sessionStorage.getItem("cart"));
+    let newCart = addToCartHandler(productToAdd);
+    sessionStorage.setItem("cart", JSON.stringify(newCart));
   }
 });
 
