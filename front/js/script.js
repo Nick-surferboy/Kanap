@@ -1,26 +1,8 @@
-const apiUrl = "http://localhost:3000/api/products/";
-
-const makeRequest = () => {
-  return new Promise((resolve, reject) => {
-    let request = new XMLHttpRequest();
-    request.open("GET", apiUrl);
-    request.send();
-    request.onreadystatechange = () => {
-      if (request.readyState === 4) {
-        if (request.status === 200 || request.status === 201) {
-          resolve(JSON.parse(request.response));
-        } else {
-          reject(JSON.parse(request.response));
-        }
-      }
-    };
-  });
-}
+import { makeRequest, apiUrl } from "./apiRequests.js";
 
 async function displayProducts() {
-  
   try {
-    const productsPromise = makeRequest();
+    const productsPromise = makeRequest('GET', apiUrl);
     const response = await Promise.all([productsPromise]);
     const products = response[0];
     const sectionItems = document.getElementById("items");

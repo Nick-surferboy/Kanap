@@ -1,9 +1,12 @@
+
 const apiUrl = "http://localhost:3000/api/products/";
 
-const makeRequest = () => {
+const makeRequest = (verb, url) => {
+  
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
-    request.open("GET", apiUrl);
+  
+    request.open(verb, url);
     request.send();
     request.onreadystatechange = () => {
       if (request.readyState === 4) {
@@ -11,10 +14,12 @@ const makeRequest = () => {
           resolve(JSON.parse(request.response));
         } else {
           reject(JSON.parse(request.response));
+          console.log(reject);
         }
       }
     };
   });
 }
 
-export { makeRequest };
+
+export  { makeRequest, apiUrl };
