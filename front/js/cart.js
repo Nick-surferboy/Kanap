@@ -1,3 +1,5 @@
+import { validateEmail, validateName } from "./fieldValidation.js";
+
 const cart__items = document.getElementById("cart__items");
 let cart = JSON.parse(sessionStorage.getItem("cart"));
 
@@ -68,6 +70,9 @@ const displayCart = () => {
   document.getElementById("totalPrice").innerText =
     " " + getTotalAmount().toLocaleString();
   document.getElementById("totalQuantity").innerText = cart.length;
+  document
+    .getElementsByClassName("cart__order__form")[0]
+    .addEventListener("submit", order);
 };
 
 const getTotalAmount = () => {
@@ -119,6 +124,43 @@ const removeProductFromCart = (e) => {
   document.getElementById("totalPrice").innerText =
     " " + getTotalAmount().toLocaleString();
   window.location.reload();
+};
+
+const order = (event) => {
+  event.preventDefault();
+  let isFormValide = true;
+  document.getElementById("emailErrorMsg").innerText = "";
+  document.getElementById("lastNameErrorMsg").innerText = "";
+  document.getElementById("firstNameErrorMsg").innerText = "";
+
+  if (!validateName(document.getElementById("firstName").value)) {
+    //afficher message d'erreur
+    document.getElementById("firstNameErrorMsg").innerText =
+      "Please enter a valid first name";
+    isFormValide = false;
+  }
+
+  if (!validateName(document.getElementById("lastName").value)) {
+    //afficher message d'erreur
+    document.getElementById("lastNameErrorMsg").innerText =
+      "Please enter a valid last name";
+    isFormValide = false;
+  }
+
+  if (!validateEmail(document.getElementById("email").value)) {
+    //afficher message d'erreur
+    document.getElementById("emailErrorMsg").innerText =
+      "Please enter a valid email adress";
+    isFormValide = false;
+  }
+
+  if (isFormValide) {
+    //recalculer le total amount
+    //aficher un message si différent
+    //alert("order") ;
+  } else {
+    return;
+  }
 };
 
 if (sessionStorage.cart) {
