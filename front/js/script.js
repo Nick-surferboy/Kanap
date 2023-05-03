@@ -29,7 +29,7 @@ function createProduct(id, imageUrl, alt, name, desc) {
   image.alt = alt;
 
   let title = document.createElement("h3");
-  title.class = "productName";
+  title.className = "productName";
   title.innerText = name;
 
   let paragraph = document.createElement("p");

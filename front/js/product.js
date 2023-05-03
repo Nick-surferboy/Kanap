@@ -73,6 +73,10 @@ const addToCartHandler = (product) => {
 addToCartBtn.addEventListener("click", () => {
   const quantity = parseInt(document.getElementById("quantity").value);
   const color = colors.value;
+  if (!(quantity >= 1 && quantity <= 100) || color === "") {
+    alert("Please enter a valid color and/or number of articles");
+    return;
+  }
   const titleCart = title.textContent;
   const priceCart = price.textContent;
   const imageSrc = divImage[0].getElementsByTagName("img")[0].src;
