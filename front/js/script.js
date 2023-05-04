@@ -1,4 +1,5 @@
-import { makeRequest, apiUrl } from "./apiRequests.js";
+import { makeRequest } from "./apiRequests.js";
+const apiUrl = "http://localhost:3000/api/products/";
 
 async function displayProducts() {
   try {

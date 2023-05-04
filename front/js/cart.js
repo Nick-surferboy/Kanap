@@ -1,4 +1,8 @@
-import { validateEmail, validateName } from "./fieldValidation.js";
+import {
+  validateEmail,
+  validateName,
+  validateTotalAmount,
+} from "./fieldValidation.js";
 
 const cart__items = document.getElementById("cart__items");
 let cart = JSON.parse(sessionStorage.getItem("cart"));
@@ -72,7 +76,7 @@ const displayCart = () => {
   document.getElementById("totalQuantity").innerText = cart.length;
   document
     .getElementsByClassName("cart__order__form")[0]
-    .addEventListener("submit", order);
+    .addEventListener("submit", orderHandler);
 };
 
 const getTotalAmount = () => {
@@ -91,7 +95,6 @@ const updateCart = (e) => {
   }
   const articleColor = e.target.closest("article").dataset.color;
   const articleId = e.target.closest("article").dataset.id;
-  const cart = JSON.parse(sessionStorage.getItem("cart"));
 
   const existingProductIndex = cart.findIndex(
     (cartItem) => cartItem.id === articleId && cartItem.color === articleColor
@@ -99,7 +102,6 @@ const updateCart = (e) => {
   const existingCartProduct = cart[existingProductIndex];
   let updatedProduct;
   let updatedCart = [...cart];
-
   updatedProduct = {
     ...existingCartProduct,
     quantity: e.target.value,
@@ -114,9 +116,7 @@ const updateCart = (e) => {
 const removeProductFromCart = (e) => {
   const articleColor = e.target.closest("article").dataset.color;
   const articleId = e.target.closest("article").dataset.id;
-  const cart = JSON.parse(sessionStorage.getItem("cart"));
 
-  let updatedCart = [...cart];
   updatedCart = cart.filter(
     (item) => !(item.id === articleId && item.color === articleColor)
   );
@@ -126,41 +126,34 @@ const removeProductFromCart = (e) => {
   window.location.reload();
 };
 
-const order = (event) => {
+const orderHandler = (event) => {
   event.preventDefault();
   let isFormValide = true;
   document.getElementById("emailErrorMsg").innerText = "";
   document.getElementById("lastNameErrorMsg").innerText = "";
   document.getElementById("firstNameErrorMsg").innerText = "";
 
+  //Input fields validation
   if (!validateName(document.getElementById("firstName").value)) {
-    //afficher message d'erreur
     document.getElementById("firstNameErrorMsg").innerText =
       "Please enter a valid first name";
     isFormValide = false;
   }
-
   if (!validateName(document.getElementById("lastName").value)) {
-    //afficher message d'erreur
     document.getElementById("lastNameErrorMsg").innerText =
       "Please enter a valid last name";
     isFormValide = false;
   }
-
   if (!validateEmail(document.getElementById("email").value)) {
-    //afficher message d'erreur
     document.getElementById("emailErrorMsg").innerText =
       "Please enter a valid email adress";
     isFormValide = false;
   }
 
-  if (isFormValide) {
-    //recalculer le total amount
-    //aficher un message si différent
-    //alert("order") ;
-  } else {
+  if (!isFormValide) {
     return;
   }
+  validateTotalAmount();
 };
 
 if (sessionStorage.cart) {
