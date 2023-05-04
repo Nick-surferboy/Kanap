@@ -28,12 +28,12 @@ const validateName = (name) => {
 
 async function validateTotalAmount() {
   let recalculatedTotalAmount = 0;
-
+  let cartTotalAmount = 0;
+  let products = [];
   try {
     const productsPromise = makeRequest("GET", apiUrl);
     const response = await Promise.all([productsPromise]);
-    const products = response[0];
-    alert(products) ;
+    products = response[0];
   } catch (error) {
     document.getElementById("formErrorMsg").innerText =
       "An error occured, please try another time";
@@ -42,8 +42,16 @@ async function validateTotalAmount() {
   }
 
   for (let i = 0; i < cart.length; i++) {
-
-
+    const existingProductIndex = products.findIndex(
+      (cartItem) => cartItem.id === cart.id
+    );
+    recalculatedTotalAmount =
+      recalculatedTotalAmount +
+      products[existingProductIndex].price * cart[i].quantity;
+    cartTotalAmount = cartTotalAmount + cart[i].priceCart * cart[i].quantity;
+  }
+  if (recalculatedTotalAmount !== cartTotalAmount) {
+    alert("tricheur");
   }
 }
 
