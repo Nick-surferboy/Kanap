@@ -26,33 +26,40 @@ const validateName = (name) => {
   }
 };
 
-async function validateTotalAmount() {
+function validateCartPrice() {
   let recalculatedTotalAmount = 0;
   let cartTotalAmount = 0;
-  let products = [];
-  try {
-    const productsPromise = makeRequest("GET", apiUrl);
-    const response = await Promise.all([productsPromise]);
-    products = response[0];
-  } catch (error) {
+  let isValid = false;
+
+  const productsPromise = makeRequest("GET", apiUrl);
+  
+  
+  productsPromise.then((result) => {
+    for (let i = 0; i < cart.length; i++) {
+      const existingProductIndex = result.findIndex(
+        (cartItem) => cartItem._id === cart[i].id
+      );
+      recalculatedTotalAmount =
+        recalculatedTotalAmount +
+        result[existingProductIndex].price * cart[i].quantity;
+      cartTotalAmount = cartTotalAmount + cart[i].priceCart * cart[i].quantity;
+    }
+    if (recalculatedTotalAmount === cartTotalAmount) {
+      alert("ok")
+      isValid = true;
+    } else {
+      alert("cheater!");
+    }
+  });
+  productsPromise.catch((error) => {
     document.getElementById("formErrorMsg").innerText =
       "An error occured, please try another time";
     console.log("This is the error message :" + error);
-    return;
-  }
-
-  for (let i = 0; i < cart.length; i++) {
-    const existingProductIndex = products.findIndex(
-      (cartItem) => cartItem.id === cart.id
-    );
-    recalculatedTotalAmount =
-      recalculatedTotalAmount +
-      products[existingProductIndex].price * cart[i].quantity;
-    cartTotalAmount = cartTotalAmount + cart[i].priceCart * cart[i].quantity;
-  }
-  if (recalculatedTotalAmount !== cartTotalAmount) {
-    alert("tricheur");
-  }
+  });
+  productsPromise.finally(() => {
+    alert("finally")
+    return isValid;
+  });
 }
 
-export { validateEmail, validateName, validateTotalAmount };
+export { validateEmail, validateName, validateCartPrice };

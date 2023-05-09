@@ -1,8 +1,11 @@
 import {
   validateEmail,
   validateName,
-  validateTotalAmount,
+  validateCartPrice,
 } from "./fieldValidation.js";
+
+import { postRequest } from "./apiRequests.js";
+const apiUrl = "http://localhost:3000/api/";
 
 const cart__items = document.getElementById("cart__items");
 let cart = JSON.parse(sessionStorage.getItem("cart"));
@@ -126,7 +129,7 @@ const removeProductFromCart = (e) => {
   window.location.reload();
 };
 
-const orderHandler = (event) => {
+async function orderHandler(event) {
   event.preventDefault();
   let isFormValide = true;
   document.getElementById("emailErrorMsg").innerText = "";
@@ -153,8 +156,42 @@ const orderHandler = (event) => {
   if (!isFormValide) {
     return;
   }
-  validateTotalAmount();
-};
+
+  //const isPriceValid = validateCartPrice()
+
+  // alert("1 : " + isPriceValid);
+  //  if (isPriceValid) {
+  //  alert("2");
+  let contact = {
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    email: document.getElementById("email").value,
+  };
+
+  const products = [];
+  for (let i = 0; i < cart.length; i++) {
+    products.push(cart[i].id);
+  }
+
+  const productPromise = postRequest(
+    {
+      contact: contact,
+      products: products,
+    },
+    apiUrl + "products/"
+  );
+  try {
+    const response = await Promise.all([productPromise]);
+   // alert("12" + response[0].orderId);
+   console.log(window);
+   window.location.replace("./confirmation.html?orderId="+response[0].orderId);
+  } catch (error) {
+    console.log("This is the error message :" + error);
+  }
+  // console.log(response);
+}
 
 if (sessionStorage.cart) {
   displayCart();
