@@ -1,5 +1,5 @@
-import { makeRequest } from "./apiRequests.js";
-const apiUrl = "http://localhost:3000/api/products/";
+import { makeRequest, hostApiName } from "./apiRequests.js";
+const apiUrl = hostApiName+"products/";
 
 async function displayProducts() {
   try {

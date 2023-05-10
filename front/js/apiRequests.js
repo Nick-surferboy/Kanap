@@ -1,3 +1,5 @@
+const hostApiName = "http://localhost:3000/api/";
+
 const makeRequest = (verb, url) => {
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
@@ -35,4 +37,4 @@ function postRequest(data, url) {
   });
 }
 
-export { makeRequest, postRequest };
+export { makeRequest, postRequest, hostApiName };

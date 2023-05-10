@@ -1,6 +1,6 @@
-import { makeRequest } from "./apiRequests.js";
+import { makeRequest, hostApiName } from "./apiRequests.js";
 let cart = JSON.parse(sessionStorage.getItem("cart"));
-const apiUrl = "http://localhost:3000/api/products/";
+const apiUrl = hostApiName+"products/";
 
 const validateEmail = (email) => {
   // regex pattern for email
@@ -32,8 +32,6 @@ function validateCartPrice() {
   let isValid = false;
 
   const productsPromise = makeRequest("GET", apiUrl);
-  
-  
   productsPromise.then((result) => {
     for (let i = 0; i < cart.length; i++) {
       const existingProductIndex = result.findIndex(

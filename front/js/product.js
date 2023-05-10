@@ -1,11 +1,8 @@
-import { makeRequest } from "./apiRequests.js";
-const apiUrl = "http://localhost:3000/api/products/";
+import { makeRequest, hostApiName } from "./apiRequests.js";
+const apiUrl = hostApiName + "products/";
 
 //Get DOM elements
 const divImage = document.getElementsByClassName("item__img");
-const price = document.getElementById("price");
-const title = document.getElementById("title");
-const description = document.getElementById("description");
 const colors = document.getElementById("colors");
 const addToCartBtn = document.getElementById("addToCart");
 
@@ -30,7 +27,6 @@ async function displayProduct() {
     console.log(error);
     return;
   }
-
   //display the product
   let image = document.createElement("img");
   image.src = product.imageUrl;
@@ -39,7 +35,7 @@ async function displayProduct() {
 
   price.textContent = product.price;
   title.textContent = product.name;
-  description.textContent = product.description;
+  document.getElementById("description").textContent = product.description;
 
   for (let i = 0; i < product.colors.length; i++) {
     let option = document.createElement("option");
@@ -54,7 +50,6 @@ const addToCartHandler = (product) => {
     (cartItem) => cartItem.id === product.id && cartItem.color === product.color
   );
   const existingCartProduct = cart[existingProductIndex];
-
   let updatedProduct;
   let updatedCart = [...cart];
 
@@ -72,30 +67,24 @@ const addToCartHandler = (product) => {
 
 addToCartBtn.addEventListener("click", () => {
   const quantity = parseInt(document.getElementById("quantity").value);
-  const color = colors.value;
-  if (!(quantity >= 1 && quantity <= 100) || color === "") {
+  if (!(quantity >= 1 && quantity <= 100) || colors.value === "") {
     alert("Please enter a valid color and/or number of articles");
     return;
   }
-  const titleCart = title.textContent;
-  const priceCart = price.textContent;
-  const imageSrc = divImage[0].getElementsByTagName("img")[0].src;
-  const imageAlt = divImage[0].getElementsByTagName("img")[0].alt;
   const productToAdd = {
     id,
-    color,
+    color: colors.value,
     quantity,
-    titleCart,
-    imageSrc,
-    imageAlt,
-    priceCart,
+    titleCart: document.getElementById("title").textContent,
+    imageSrc: divImage[0].getElementsByTagName("img")[0].src,
+    imageAlt: divImage[0].getElementsByTagName("img")[0].alt,
+    priceCart: document.getElementById("price").textContent,
   };
 
-  if (sessionStorage.cart) {
-    cart = JSON.parse(sessionStorage.getItem("cart"));
-    let newCart = addToCartHandler(productToAdd);
-    sessionStorage.setItem("cart", JSON.stringify(newCart));
-  }
+  sessionStorage.setItem(
+    "cart",
+    JSON.stringify(addToCartHandler(productToAdd))
+  );
 });
 
 displayProduct();

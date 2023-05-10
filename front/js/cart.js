@@ -4,12 +4,12 @@ import {
   validateCartPrice,
 } from "./fieldValidation.js";
 
-import { postRequest } from "./apiRequests.js";
-const apiUrl = "http://localhost:3000/api/";
-
+import { postRequest, hostApiName } from "./apiRequests.js";
+const apiUrl = hostApiName;
 const cart__items = document.getElementById("cart__items");
 let cart = JSON.parse(sessionStorage.getItem("cart"));
 
+//Display products of the cart on the page
 const displayCart = () => {
   for (let i = 0; i < cart.length; i++) {
     let article = document.createElement("article");
@@ -82,6 +82,7 @@ const displayCart = () => {
     .addEventListener("submit", orderHandler);
 };
 
+//Get the total amount of the cart
 const getTotalAmount = () => {
   let totalAmount = 0;
   for (let i = 0; i < cart.length; i++) {
@@ -90,6 +91,7 @@ const getTotalAmount = () => {
   return totalAmount;
 };
 
+//Update the quantity for a specific product
 const updateCart = (e) => {
   if (e.target.value <= 0 || e.target.value > 100) {
     alert("Please enter a quantity between 1 and 100");
@@ -110,28 +112,30 @@ const updateCart = (e) => {
     quantity: e.target.value,
   };
   updatedCart[existingProductIndex] = updatedProduct;
-  sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-  document.getElementById("totalPrice").innerText =
-    " " + getTotalAmount().toLocaleString();
-  window.location.reload();
+  updatePriceInDOMandSessionStorage(updatedCart);
 };
 
+//Remove a product from the cart
 const removeProductFromCart = (e) => {
   const articleColor = e.target.closest("article").dataset.color;
   const articleId = e.target.closest("article").dataset.id;
 
-  updatedCart = cart.filter(
+  let updatedCart = cart.filter(
     (item) => !(item.id === articleId && item.color === articleColor)
   );
+  updatePriceInDOMandSessionStorage(updatedCart);
+};
+
+//Update the DOM and the session storage item of the cart price
+const updatePriceInDOMandSessionStorage = (updatedCart) => {
   sessionStorage.setItem("cart", JSON.stringify(updatedCart));
   document.getElementById("totalPrice").innerText =
     " " + getTotalAmount().toLocaleString();
   window.location.reload();
 };
 
-async function orderHandler(event) {
-  event.preventDefault();
-  let isFormValide = true;
+//Validate the form inputs of the cart
+const inputCartValidation = () => {
   document.getElementById("emailErrorMsg").innerText = "";
   document.getElementById("lastNameErrorMsg").innerText = "";
   document.getElementById("firstNameErrorMsg").innerText = "";
@@ -140,36 +144,31 @@ async function orderHandler(event) {
   if (!validateName(document.getElementById("firstName").value)) {
     document.getElementById("firstNameErrorMsg").innerText =
       "Please enter a valid first name";
-    isFormValide = false;
+    return false;
   }
   if (!validateName(document.getElementById("lastName").value)) {
     document.getElementById("lastNameErrorMsg").innerText =
       "Please enter a valid last name";
-    isFormValide = false;
+    return false;
   }
   if (!validateEmail(document.getElementById("email").value)) {
     document.getElementById("emailErrorMsg").innerText =
       "Please enter a valid email adress";
-    isFormValide = false;
+    return false;
   }
+  return true;
+};
 
-  if (!isFormValide) {
+async function orderHandler(event) {
+  event.preventDefault();
+  if (!inputCartValidation()) {
     return;
   }
-
   //const isPriceValid = validateCartPrice()
 
   // alert("1 : " + isPriceValid);
   //  if (isPriceValid) {
   //  alert("2");
-  let contact = {
-    firstName: document.getElementById("firstName").value,
-    lastName: document.getElementById("lastName").value,
-    address: document.getElementById("address").value,
-    city: document.getElementById("city").value,
-    email: document.getElementById("email").value,
-  };
-
   const products = [];
   for (let i = 0; i < cart.length; i++) {
     products.push(cart[i].id);
@@ -177,20 +176,25 @@ async function orderHandler(event) {
 
   const productPromise = postRequest(
     {
-      contact: contact,
+      contact: {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+      },
       products: products,
     },
     apiUrl + "products/"
   );
   try {
     const response = await Promise.all([productPromise]);
-   // alert("12" + response[0].orderId);
-   console.log(window);
-   window.location.replace("./confirmation.html?orderId="+response[0].orderId);
+    window.location.replace(
+      "./confirmation.html?orderId=" + response[0].orderId
+    );
   } catch (error) {
-    console.log("This is the error message :" + error);
+    console.log("This is the error message : " + error);
   }
-  // console.log(response);
 }
 
 if (sessionStorage.cart) {
