@@ -1,6 +1,5 @@
 import { makeRequest, hostApiName } from "./apiRequests.js";
-let cart = JSON.parse(sessionStorage.getItem("cart"));
-const apiUrl = hostApiName+"products/";
+const apiUrl = hostApiName + "products/";
 
 const validateEmail = (email) => {
   // regex pattern for email
@@ -26,37 +25,29 @@ const validateName = (name) => {
   }
 };
 
-function validateCartPrice() {
+async function validateCartPrice() {
   let recalculatedTotalAmount = 0;
   let cartTotalAmount = 0;
-  let isValid = false;
-
+  let cart = JSON.parse(sessionStorage.getItem("cart"));
   const productsPromise = makeRequest("GET", apiUrl);
-  productsPromise.then((result) => {
-    for (let i = 0; i < cart.length; i++) {
-      const existingProductIndex = result.findIndex(
-        (cartItem) => cartItem._id === cart[i].id
-      );
-      recalculatedTotalAmount =
-        recalculatedTotalAmount +
-        result[existingProductIndex].price * cart[i].quantity;
-      cartTotalAmount = cartTotalAmount + cart[i].priceCart * cart[i].quantity;
-    }
+  const response = await Promise.all([productsPromise]);
+  const result = response[0];
+  for (let i = 0; i < cart.length; i++) {
+    const existingProductIndex = result.findIndex(
+      (cartItem) => cartItem._id === cart[i].id
+    );
+    recalculatedTotalAmount =
+      recalculatedTotalAmount +
+      result[existingProductIndex].price * cart[i].quantity;
+    cartTotalAmount = cartTotalAmount + cart[i].priceCart * cart[i].quantity;
+  }
+
+  return new Promise((resolve, reject) => {
     if (recalculatedTotalAmount === cartTotalAmount) {
-      alert("ok")
-      isValid = true;
+      resolve(true);
     } else {
-      alert("cheater!");
+      reject("cheater");
     }
-  });
-  productsPromise.catch((error) => {
-    document.getElementById("formErrorMsg").innerText =
-      "An error occured, please try another time";
-    console.log("This is the error message :" + error);
-  });
-  productsPromise.finally(() => {
-    alert("finally")
-    return isValid;
   });
 }
 

@@ -160,40 +160,46 @@ const inputCartValidation = () => {
 };
 
 async function orderHandler(event) {
+  let response;
   event.preventDefault();
   if (!inputCartValidation()) {
     return;
   }
-  //const isPriceValid = validateCartPrice()
-
-  // alert("1 : " + isPriceValid);
-  //  if (isPriceValid) {
-  //  alert("2");
-  const products = [];
-  for (let i = 0; i < cart.length; i++) {
-    products.push(cart[i].id);
-  }
-
-  const productPromise = postRequest(
-    {
-      contact: {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        address: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        email: document.getElementById("email").value,
-      },
-      products: products,
-    },
-    apiUrl + "products/"
-  );
   try {
-    const response = await Promise.all([productPromise]);
-    window.location.replace(
-      "./confirmation.html?orderId=" + response[0].orderId
-    );
+    const isPriceValid = validateCartPrice();
+    response = await Promise.all([isPriceValid]);
+
+    if (response) {
+      const products = [];
+      for (let i = 0; i < cart.length; i++) {
+        products.push(cart[i].id);
+      }
+      const productPromise = postRequest(
+        {
+          contact: {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            email: document.getElementById("email").value,
+          },
+          products: products,
+        },
+        apiUrl + "products/"
+      );
+
+      response = await Promise.all([productPromise]);
+      window.location.replace(
+        "./confirmation.html?orderId=" + response[0].orderId
+      );
+    }
   } catch (error) {
-    console.log("This is the error message : " + error);
+    if (error === "cheater") {
+      document.getElementById("formErrorMsg").innerText =
+        "Now you know how to cheat by modifying the cart, fix it to place your order";
+    } else {
+      console.log(error);
+    }
   }
 }
 
