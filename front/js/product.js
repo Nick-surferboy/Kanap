@@ -17,8 +17,7 @@ let cart = JSON.parse(sessionStorage.getItem("cart"));
 
 async function displayProduct() {
   //Retrieve the product id clicked previously
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
+  const urlParams = new URLSearchParams(window.location.search);
   id = urlParams.get("id");
 
   //Retrieve the product to display

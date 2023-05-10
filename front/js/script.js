@@ -20,7 +20,7 @@ async function displayProducts() {
       );
     }
   } catch (error) {
-    console.log("This is the error message :" + error);
+    console.log("This is the error message : " + error);
   }
 }
 
