@@ -2,7 +2,7 @@
 
 This is the front end and back end server for Project 5 of the Web Developer path from OpenClassroom.
 
-The HMTL and CSS have been already done, only the Javascript side has been created by myself.
+The HMTL and CSS have been already done, only the Javascript side has been created by myself (Nick-SurferBoy).
 
 ### Back end Prerequisites ###
 
